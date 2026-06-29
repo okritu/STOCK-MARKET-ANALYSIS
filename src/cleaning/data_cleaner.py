@@ -66,7 +66,10 @@ def clean_stock_data(df):
     missing_count = df.isnull().sum().sum()
     if missing_count > 0:
         logger.info(f"Found {missing_count} missing values. Performing ffill/bfill within tickers.")
-        df = df.groupby("Ticker", group_keys=False).apply(lambda group: group.ffill().bfill())
+        for col in df.columns:
+            if col not in ["Date", "Ticker"]:
+                df[col] = df.groupby("Ticker")[col].transform(lambda x: x.ffill().bfill())
+
         
     # Handle duplicates
     dup_count = df.duplicated().sum()

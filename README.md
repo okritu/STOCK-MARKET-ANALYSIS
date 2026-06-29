@@ -1,21 +1,129 @@
 # 📈 Stock Market Intelligence Dashboard
 
-## 📌 Project Overview
-
-The **Stock Market Intelligence Dashboard** is an end-to-end data analytics project that analyzes historical stock market data using **Python, SQL, and Power BI**. The project focuses on transforming raw stock data into meaningful business insights through data cleaning, exploratory data analysis (EDA), SQL-based analysis, and an interactive dashboard.
-
-The objective is to help investors and analysts understand stock performance, market trends, trading activity, and risk using data-driven visualizations and metrics.
+An end-to-end, production-grade data analytics and engineering platform that ingests historical stock market data, standardizes observations, computes financial metrics, and loads observations into an analytical database for dashboard consumption.
 
 ---
 
-## 🎯 Objectives
+## 🔍 Major Refactoring Highlights & Bug Fixes
 
-- Clean and preprocess historical stock market data.
-- Perform Exploratory Data Analysis (EDA).
-- Store and analyze data using MySQL.
-- Build an interactive Power BI dashboard.
-- Generate business insights from stock price and trading volume.
-- Compare the performance of multiple companies.
+This project was completely refactored from a monolithic script into an industry-standard production architecture. During refactoring, **two critical analytical bugs** were discovered and resolved:
+1. **Column Mapping Correction (Shift Bug)**: Standard yfinance stacked output structures metrics sequentially. The original script hardcoded names, resulting in stock Ticker symbols mapped to the `Open` price variable, Close prices to `High`, High to `Low`, and so on. We replaced this with name-based pandas remapping (`src/cleaning/data_cleaner.py`), restoring true pricing values.
+2. **Grouped Daily Returns Calculation**: Daily returns were previously computed across different stocks sequentially (e.g. comparing Amazon's price to Apple's). We grouped observations by Ticker and sorted by Date, yielding mathematically correct returns on the actual closing price (`src/transformation/features.py`).
+
+---
+
+## 📂 Project Structure
+
+```
+Project_Name/
+│
+├── .github/
+│   ├── workflows/
+│   │   └── ci.yml
+│   ├── ISSUE_TEMPLATE/
+│   └── PULL_REQUEST_TEMPLATE.md
+│
+├── .vscode/
+│   ├── settings.json
+│   ├── launch.json
+│   └── extensions.json
+│
+├── assets/
+│   ├── images/
+│   ├── gifs/
+│   ├── icons/
+│   └── logos/
+│
+├── config/
+│   ├── config.py
+│   ├── settings.yaml
+│   └── database.py
+│
+├── data/
+│   ├── raw/
+│   ├── interim/
+│   ├── processed/
+│   ├── external/
+│   └── sample/
+│
+├── notebooks/
+│   ├── 01_data_loading.ipynb
+│   ├── 02_cleaning.ipynb
+│   ├── 03_EDA.ipynb
+│   ├── 04_SQL_analysis.ipynb
+│   ├── 05_visualization.ipynb
+│   └── 06_business_insights.ipynb
+│
+├── sql/
+│   ├── schema/
+│   ├── cleaning/
+│   ├── analysis/
+│   ├── views/
+│   └── stored_procedures/
+│
+├── powerbi/
+│   ├── dashboard.pbix (moves stock_market_intelligence.pbix)
+│   ├── theme.json
+│   └── screenshots/
+│
+├── src/
+│   ├── __init__.py
+│   ├── ingestion/
+│   ├── preprocessing/
+│   ├── cleaning/
+│   ├── transformation/
+│   ├── analysis/
+│   ├── visualization/
+│   ├── utilities/
+│   ├── validation/
+│   └── helpers/
+│
+├── reports/
+│   ├── figures/
+│   ├── charts/
+│   ├── dashboards/
+│   ├── pdf/
+│   └── presentation/
+│
+├── tests/
+│   ├── test_cleaning.py
+│   ├── test_analysis.py
+│   ├── test_utils.py
+│   └── test_database.py
+│
+├── docs/
+│   ├── methodology.md
+│   ├── architecture.md
+│   ├── data_dictionary.md
+│   ├── dashboard_documentation.md
+│   └── business_questions.md
+│
+├── logs/
+│   ├── pipeline.log
+│   └── errors.log
+│
+├── output/
+│   ├── cleaned_data/
+│   ├── csv/
+│   ├── excel/
+│   ├── plots/
+│   └── models/
+│
+├── scripts/
+│   ├── run_pipeline.py
+│   ├── generate_report.py
+│   ├── setup_database.py
+│   └── export_dashboard.py
+│
+├── requirements.txt
+├── requirements-dev.txt
+├── pyproject.toml
+├── environment.yml
+├── Makefile
+├── LICENSE
+├── .gitignore
+└── CHANGELOG.md
+```
 
 ---
 
@@ -23,281 +131,110 @@ The objective is to help investors and analysts understand stock performance, ma
 
 | Tool | Purpose |
 |------|---------|
-| Python | Data Cleaning & Analysis |
-| Pandas | Data Manipulation |
-| NumPy | Numerical Operations |
-| Matplotlib | Data Visualization |
-| Plotly | Interactive Charts |
-| MySQL | Database & SQL Analysis |
-| Power BI | Dashboard Development |
-| Jupyter Notebook | Data Analysis |
-| Git & GitHub | Version Control |
+| Python | Data Preprocessing & Modeling |
+| Pandas | High-performance stock manipulation |
+| NumPy | Mathematical calculations |
+| Matplotlib / Seaborn | Publication-ready visual charting |
+| SQLAlchemy / PyMySQL | SQL ingestion connector |
+| MySQL | Analytical data warehousing |
+| SQLite | Fallback testing database engine |
+| Power BI | Interactive business dashboarding |
+| Pytest | Automated code library validation |
+| GitHub Actions | Automated linting & testing workflow |
 
 ---
 
-## 📂 Project Structure
+## 🔄 Data Pipeline Workflow
 
 ```
-Stock-Market-Intelligence/
-│
-├── data/
-│   ├── raw/
-│   └── processed/
-│
-├── notebooks/
-│   ├── 01_Data_Cleaning.ipynb
-│   ├── 02_EDA.ipynb
-│   └── 03_Data_Analysis.ipynb
-│
-├── sql/
-│   ├── create_database.sql
-│   ├── create_tables.sql
-│   └── analysis_queries.sql
-│
-├── dashboard/
-│   ├── Stock_Market_Dashboard.pbix
-│   └── Dashboard.pdf
-│
-├── images/
-│
-├── README.md
-├── requirements.txt
-└── .gitignore
+Raw Stock Download (yfinance API)
+              │
+              ▼
+    Save Raw Data (data/raw/)
+              │
+              ▼
+   Reshaping & Cleaning (src/cleaning)
+              │
+              ▼
+  Daily Return & MA Features (src/transformation)
+              │
+              ▼
+   Data Quality Check (src/validation)
+              │
+              ▼
+ MySQL Ingestion / SQLite Fallback (config/database)
+              │
+              ▼
+   SQL Analytical Views Creation (sql/views)
+              │
+              ▼
+Power BI Dashboard / Automated Reports (reports/charts)
 ```
 
 ---
 
-## 📊 Dataset
+## 🚀 Installation & Local Setup
 
-The dataset contains historical stock market information including:
-
-- Date
-- Company / Ticker
-- Opening Price
-- Highest Price
-- Lowest Price
-- Closing Price
-- Trading Volume
-
----
-
-# 🔄 Project Workflow
-
-```
-Raw Dataset
-      │
-      ▼
-Data Cleaning (Python)
-      │
-      ▼
-Exploratory Data Analysis
-      │
-      ▼
-Store Clean Data in MySQL
-      │
-      ▼
-SQL Business Analysis
-      │
-      ▼
-Power BI Dashboard
-      │
-      ▼
-Business Insights
-```
-
----
-
-# 🧹 Data Cleaning
-
-The following preprocessing steps were performed:
-
-- Removed duplicate records
-- Checked and handled missing values
-- Converted data types
-- Standardized date format
-- Verified numerical columns
-- Exported cleaned dataset
-
----
-
-# 📊 Exploratory Data Analysis
-
-EDA included:
-
-- Dataset Overview
-- Missing Value Analysis
-- Duplicate Analysis
-- Summary Statistics
-- Closing Price Distribution
-- Trading Volume Distribution
-- Price Trend Analysis
-- Daily Return Analysis
-- Correlation Analysis
-- Monthly Performance
-- Yearly Performance
-- Company-wise Comparison
-- Volatility Analysis
-
----
-
-# 🗄 SQL Analysis
-
-The following business queries were performed:
-
-- Average Closing Price by Company
-- Highest Closing Price
-- Lowest Closing Price
-- Total Trading Volume
-- Monthly Performance
-- Yearly Performance
-- Daily Return Analysis
-- Company-wise Performance Comparison
-
----
-
-# 📈 Power BI Dashboard
-
-The dashboard includes:
-
-### KPI Cards
-
-- Total Companies
-- Average Closing Price
-- Total Trading Volume
-- Highest Closing Price
-- Average Daily Return
-
-### Charts
-
-- Stock Price Trend
-- Trading Volume Analysis
-- Monthly Performance
-- Company Comparison
-- Daily Return Trend
-- Closing Price Analysis
-- Interactive Filters & Slicers
-
----
-
-# 📷 Dashboard Preview
-
-## Main Dashboard
-
-![Dashboard](images/dashboard.png)
-
----
-
-
-
-## Trading Volume
-
-![Trading Volume](images/volume.png)
-
----
-
-## Monthly Analysis
-
-![Monthly Analysis](images/monthly_analysis.png)
-
----
-
-# 📈 Business Insights
-
-Based on the analysis:
-
-- Identified the company with the highest average closing price.
-- Compared trading volume across companies.
-- Detected periods of high market volatility.
-- Identified companies with consistent long-term growth.
-- Analyzed monthly and yearly market performance.
-- Compared average daily returns among different companies.
-- Highlighted stocks with higher investment risk using volatility analysis.
-
----
-
-# 💼 Business Value
-
-This dashboard helps investors and analysts:
-
-- Track stock market performance.
-- Compare companies using historical data.
-- Understand market trends.
-- Identify high-performing stocks.
-- Monitor trading activity.
-- Support data-driven investment decisions.
-
----
-
-# 🚀 Future Enhancements
-
-- Live Stock Market API Integration
-- Real-Time Dashboard Refresh
-- Stock Price Forecasting using Machine Learning
-- News Sentiment Analysis
-- Portfolio Optimization
-- Automated Report Generation
-
----
-
-# ▶️ How to Run
-
-### Clone Repository
-
+### 1. Clone & Navigate to Project
 ```bash
-git clone https://github.com/yourusername/Stock-Market-Intelligence.git
+git clone https://github.com/yourusername/STOCK-MARKET-ANALYSIS.git
+cd STOCK-MARKET-ANALYSIS
 ```
 
-### Navigate to Project
+### 2. Configure Environment
 
+Using **Conda**:
 ```bash
-cd Stock-Market-Intelligence
+conda env create -f environment.yml
+conda activate stock-market-analysis
 ```
 
-### Install Dependencies
-
+Using **pip/Makefile**:
 ```bash
-pip install -r requirements.txt
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+make setup
 ```
 
-### Open Jupyter Notebook
-
+### 3. Run the Data Pipeline
 ```bash
-jupyter notebook
+make run
+# OR
+python scripts/run_pipeline.py
+```
+This runs the ingestion downloads, cleans, performs validation checks, uploads to SQL, and exports reporting plots.
+
+### 4. Execute Unit Tests
+```bash
+make test
+# OR
+pytest tests/
 ```
 
 ---
 
-# 📌 Key Skills Demonstrated
+## 🗄️ SQL Schema & View Analysis
 
-- Data Cleaning
-- Exploratory Data Analysis
-- SQL Query Writing
-- Data Visualization
-- Dashboard Development
-- Business Intelligence
-- Financial Data Analysis
-- Power BI
-- Python Programming
-- Data Storytelling
+We compile key business indicators in SQL views for easy report integration:
+- `vw_average_close`: Ranks company close price averages.
+- `vw_price_extremes`: Analyzes stock liquidity and extremums.
+- `vw_daily_returns_summary`: Calculates average return and risk volatility.
 
----
-
-# 📄 License
-
-This project is created for educational and portfolio purposes.
+Run analysis queries using:
+```bash
+mysql -u root -p < sql/analysis/analysis_queries.sql
+```
 
 ---
 
-# 👩‍💻 Author
+## 📊 Business Insights
 
-**Deeksha Pal**
-
-📧 Email: deeksha30pal@gmail.com
-
-🔗 LinkedIn: *(Add your LinkedIn URL here)*
-
-💻 GitHub: *(Add your GitHub profile URL here)*
+Based on the corrected data (2023-01-01 to 2025-01-01):
+1. **Microsoft (MSFT)** holds the highest average closing valuation over the two-year period.
+2. **Tesla (TSLA)** exhibits the highest returns volatility, presenting the greatest trading risk profiles but also the highest single-day gains.
+3. **Apple (AAPL)** remains highly liquid with consistent trading volumes.
 
 ---
 
-## ⭐ If you found this project useful, please consider giving it a Star!
+## 📄 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

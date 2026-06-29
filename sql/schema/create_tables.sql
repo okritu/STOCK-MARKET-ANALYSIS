@@ -1,6 +1,8 @@
 USE stock_market_analysis;
 
-CREATE TABLE IF NOT EXISTS stock_market_cleaned (
+DROP TABLE IF EXISTS stock_market_cleaned;
+
+CREATE TABLE stock_market_cleaned (
     Date DATE NOT NULL,
     Ticker VARCHAR(10) NOT NULL,
     Open DOUBLE,

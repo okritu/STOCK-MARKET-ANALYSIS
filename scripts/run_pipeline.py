@@ -1,5 +1,9 @@
 import sys
+import os
 from sqlalchemy import text
+
+# Add the project root to sys.path to allow importing local modules
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config.config import DB_TABLE
 from config.database import get_engine
 from src.utilities.logger import setup_logger

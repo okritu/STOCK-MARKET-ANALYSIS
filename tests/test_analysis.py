@@ -23,10 +23,10 @@ def test_add_technical_indicators():
     msft_ret = transformed[transformed["Ticker"] == "MSFT"].sort_values(by="Date").reset_index(drop=True)
     
     assert pd.isna(aapl_ret.loc[0, "Daily_Return"])
-    assert aapl_ret.loc[1, "Daily_Return"] == 5.0
+    assert aapl_ret.loc[1, "Daily_Return"] == pytest.approx(5.0)
     
     assert pd.isna(msft_ret.loc[0, "Daily_Return"])
-    assert msft_ret.loc[1, "Daily_Return"] == -5.0
+    assert msft_ret.loc[1, "Daily_Return"] == pytest.approx(-5.0)
 
 def test_analytical_queries():
     data = {

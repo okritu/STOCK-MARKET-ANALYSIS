@@ -1,0 +1,53 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest cache
+.pytest_cache/
+
+# VSCode personal settings
+.vscode/launch.json
+.vscode/extensions.json
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# Local databases & fallbacks
+*.db
+*.sqlite
+
+# Logs
+logs/*.log
+*.log
+
+# Keep data directories structure but ignore contents
+data/raw/*
+!data/raw/.gitkeep
+data/interim/*
+!data/interim/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/external/*
+!data/external/.gitkeep
+data/sample/*
+!data/sample/.gitkeep
+
+# Keep output directories structure but ignore contents
+output/cleaned_data/*
+!output/cleaned_data/.gitkeep
+output/csv/*
+!output/csv/.gitkeep
+output/excel/*
+!output/excel/.gitkeep
+output/plots/*
+!output/plots/.gitkeep
+output/models/*
+!output/models/.gitkeep
+
+# Virtual Environments
+venv/
+.venv/
+env/
+.env/

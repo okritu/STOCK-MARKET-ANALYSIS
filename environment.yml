@@ -1,0 +1,10 @@
+name: stock-market-analysis
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+    - -r requirements.txt
+    - -r requirements-dev.txt

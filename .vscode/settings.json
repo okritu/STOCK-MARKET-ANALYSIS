@@ -2,14 +2,14 @@
   "python.formatting.provider": "black",
   "python.linting.enabled": true,
   "python.linting.flake8Enabled": true,
-  "python.linting.flake8Args": [
-    "--max-line-length=127"
-  ],
+  "python.formatting.blackArgs": ["--line-length=127"],
+  "python.linting.flake8Args": ["--max-line-length=127"],
   "files.exclude": {
     "**/.git": true,
     "**/.ipynb_checkpoints": true,
     "**/__pycache__": true,
-    "**/.pytest_cache": true
+    "**/.pytest_cache": true,
+    "**/*.db": true
   },
   "editor.formatOnSave": true
 }
