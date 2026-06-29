@@ -1,0 +1,30 @@
+# Database Configuration
+database:
+  driver: mysql+pymysql
+  host: localhost
+  port: 3306
+  user: root
+  password: deeksha123
+  name: stock_market_analysis
+  table_name: stock_market_cleaned
+
+# Stock Market Ingestion Settings
+ingestion:
+  tickers:
+    - AAPL
+    - MSFT
+    - GOOGL
+    - TSLA
+    - AMZN
+  start_date: "2023-01-01"
+  end_date: "2025-01-01"
+
+# File Path Configuration
+paths:
+  raw_data_path: "data/raw/stock_market_raw.csv"
+  cleaned_data_csv: "data/processed/stock_market_cleaned.csv"
+  cleaned_data_output: "output/cleaned_data/stock_market_cleaned.csv"
+  plot_output_dir: "output/plots/"
+  reports_chart_dir: "reports/charts/"
+  log_file_path: "logs/pipeline.log"
+  error_log_path: "logs/errors.log"
